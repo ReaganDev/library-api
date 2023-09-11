@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { BookController } from './book.controller';
 import { BookService } from './book.service';
 import { BookSchema } from './schemas/book.schema';
-import { AuthModule } from 'src/auth/auth.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
     // ensure to register ur models in the module file 

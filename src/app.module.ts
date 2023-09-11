@@ -13,7 +13,8 @@ import { AuthModule } from './auth/auth.module';
       envFilePath : '.env',
       isGlobal : true
     }),
-    MongooseModule.forRoot(process.env.MONGO_PATH),
+    // changed mongo db string for testing
+    MongooseModule.forRoot(process.env.MONGO_PATH1),
     BookModule,
     AuthModule
   ],

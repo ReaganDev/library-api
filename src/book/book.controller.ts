@@ -14,31 +14,31 @@ export class BookController {
     @UseGuards(AuthGuard())
     @HttpCode(200)
     async getAllBooks(@Query()query: ExpressQuery, @Req() req): Promise<Book[]>{
-        const books = await this.bookService.getAllBooks(query,req.user)
+        const books = await this.bookService.getAllBooks(query, req.user)
         return books
     }
 
     @Get(':id')
     @UseGuards(AuthGuard())
     @HttpCode(200)
-    async getSingleBook(@Param('id')id: string,@Req() req): Promise<Book>{
-        const book = await this.bookService.getSingleBook(id,req.user)
+    async getSingleBook(@Param('id')id: string, @Req() req): Promise<Book>{
+        const book = await this.bookService.getSingleBook(id, req.user)
         return book
     }
 
     @Delete(':id')
     @UseGuards(AuthGuard())
-    @HttpCode(204)
-    async deleteBook(@Param('id')id: string,@Req() req): Promise<Book>{
-        const book = await this.bookService.deleteBook(id,req.user)
-        return book
+    @HttpCode(200)
+    async deleteBook(@Param('id')id: string, @Req() req): Promise<{deleted : boolean}>{
+        const result = await this.bookService.deleteBook(id, req.user)
+        return result
     }
 
     @Put(':id')
     @UseGuards(AuthGuard())
     @HttpCode(200)
-    async updateBook(@Param('id')id: string, @Body() book: UpdateBookDto,@Req() req): Promise<Book>{
-        const res = await this.bookService.updateBook(id, book,req.user)
+    async updateBook(@Param('id')id: string, @Body() book: UpdateBookDto, @Req() req): Promise<Book>{
+        const res = await this.bookService.updateBook(id, book, req.user)
         return res
     }
 

@@ -4,7 +4,7 @@ import { Book } from './schemas/book.schema';
 import { Query } from 'express-serve-static-core'
 
 import * as mongoose from 'mongoose';
-import { User } from 'src/auth/schemas/user.schema';
+import { User } from '../auth/schemas/user.schema';
 @Injectable()
 export class BookService {
     constructor(
@@ -16,7 +16,6 @@ export class BookService {
         const itemsPerPage = 2
         
         const currentPage = Number(query.page) || 1
-        console.log(query.page);
         const skip = itemsPerPage * (currentPage - 1)
         const keys = query.search ? {
             title: {
@@ -24,43 +23,47 @@ export class BookService {
                 $options: 'i'
             }
         } : {}
-        const books = await this.bookModel.find({user:user._id ,...keys}).limit(itemsPerPage).skip(skip)
+        const books = await this.bookModel.find({...keys, user: user._id}).limit(itemsPerPage).skip(skip)
         return books
     }
 
-    async getSingleBook(id:string,user: User): Promise<Book>{
-        const isValidId = await this.validateId(id)
+    async getSingleBook(id:string, user: User): Promise<Book>{
+        const isValidId = mongoose.isValidObjectId(id)
         if (!isValidId) {
             throw new BadRequestException('Please provide a valid id')
         }
 
-        const book = await this.bookModel.findOne({_id : id,user: user._id})
+        const book = await this.bookModel.findOne({_id:id, user: user._id})
         if (!book) {
             throw new NotFoundException('Book does not exist')
         }
         return book
     }
 
-    async deleteBook(id:string,user: User): Promise<Book>{
+    async deleteBook(id:string, user: User): Promise<{deleted : boolean}>{
         const isValidId = await this.validateId(id)
         if (!isValidId) {
             throw new BadRequestException('Please provide a valid id')
         }
         
-        const book = await this.bookModel.findOneAndDelete({_id : id,user: user._id})
+        const book = await this.bookModel.findOneAndDelete({_id:id, user : user._id})
         if (!book) {
             throw new NotFoundException('Book does not exist')
         }
-        return book
+        return {deleted : true}
     }
 
-    async updateBook(id:string, book :Book,user: User): Promise<Book>{
+    async updateBook(id:string, book :Book, user: User): Promise<Book>{
         const isValidId = await this.validateId(id)
         if (!isValidId) {
             throw new BadRequestException('Please provide a valid id')
         }
 
-        const res = await this.bookModel.findOneAndUpdate({_id : id,user: user._id}, book, {runValidators : true, new : true})
+        const res = await this.bookModel.findOneAndUpdate({_id: id,user: user._id },book, {runValidators : true, new : true})
+
+        if (!res) {
+            throw new NotFoundException('Book does not exist')
+        }
 
         return res
        
